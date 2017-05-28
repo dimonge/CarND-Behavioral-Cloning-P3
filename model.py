@@ -36,6 +36,9 @@ def generator(samples, batch_size=32):
       y_train = np.array(angles)
       yield sklearn.utils.shuffle(X_train, y_train)
 
+from keras.models import Sequential, Model
+from keras.layers import Flatten, Lambda, Cropping2D
+
 # compile and train the model using the generator function
 train_generator = generator(train_samples, batch_size=32)
 validation_generator = generator(validation_samples, batch_size=32)
@@ -76,13 +79,4 @@ def augment_images_direction(images, angle):
 
 def augment_steering_angle(measurements):
   pass
-
-
-from keras.models import Sequential, Model 
-from keras.layers import Flatten
-
-file_name = './data/driving_log.csv'
-read_lines(file_name)
-
-
 
