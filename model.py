@@ -9,6 +9,7 @@ def read_lines(file_name):
   return lines
 
 from sklearn.model_selection import train_test_split
+
 file_name = './data/driving_log.csv'
 samples = read_lines(file_name)
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
@@ -37,7 +38,7 @@ def generator(samples, batch_size=32):
       yield sklearn.utils.shuffle(X_train, y_train)
 
 from keras.models import Sequential, Model
-from keras.layers import Flatten, Lambda, Cropping2D
+from keras.layers import Flatten, Lambda, Cropping2D, Convolution2D, MaxPooling2D, Dense
 
 # compile and train the model using the generator function
 train_generator = generator(train_samples, batch_size=32)
@@ -50,14 +51,25 @@ model = Sequential()
 model.add(Lambda(lambda x: x/127.5 - 1.,
         input_shape=(ch, row, col),
         output_shape=(ch, row, col)))
-model.add(... finish defining the rest of your model architecture here ...)
 
+# applying Lenet
+def LeNet():  
+  model.add(Convolution2D(6,5,5, activation='relu'))
+  model.add(MaxPooling2D())
+  model.add(Convolution2D(6,5,5, activation='relu'))
+  model.add(MaxPooling2D())
+  model.add(Flatten())
+  model.add(Dense(120))
+  model.add(Dense(84))
+  model.add(Dense(1))
+
+LeNet()
 model.compile(loss='mse', optimizer='adam')
 model.fit_generator(train_generator, samples_per_epoch= /
             len(train_samples), validation_data=validation_generator, /
             nb_val_samples=len(validation_samples), nb_epoch=3)
 
-
+"""
 def process_file(lines):
   data = {}
   images = []
@@ -79,4 +91,4 @@ def augment_images_direction(images, angle):
 
 def augment_steering_angle(measurements):
   pass
-
+"""
