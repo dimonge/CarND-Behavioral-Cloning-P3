@@ -18,11 +18,12 @@ import cv2
 import numpy as np
 import sklearn
 from sklearn.utils import shuffle
-ch, row, col = 3, 80, 320  # Trimmed image format
+ch, row, col = 3, 160, 320  # Trimmed image format
 
 def flip_image(image, measurement):
-  image = cv2.flip(image, 1)
-  measurement = -measurement
+  if np.random.rand() < 0.5:
+    image = cv2.flip(image, 1)
+    measurement = -measurement
   return image, measurement
 
 def recovery_argument(file_dir, image_center, image_left, image_right, measurement):
@@ -40,9 +41,14 @@ def load_image(image_dir, image_type):
   image_dir = image_dir+image_type
   return cv2.imread(image_dir)
 
+def argument_image_data(file_dir, center_image, left_image, right_image, measurement):
+  image, measurement = recovery_argument(file_dir, center_image, left_image, right_image, measurement)
+  image, measurement = flip_image(image, measurement)
+  return image, measurement
+
 def generator(samples, training, batch_size=32):
   num_samples = len(samples)
-  images = np.empty([batch_size, col, row, ch])
+  images = np.empty([batch_size, row, col, ch])
   angles = np.empty(batch_size)
   while 1: # Loop forever so the generator never terminates
     index = 0
@@ -52,18 +58,18 @@ def generator(samples, training, batch_size=32):
       #images = np.empty([batch_size, row, col, ch]) 
      # angles = np.empty(batch_size)
       for batch_sample in batch_samples:
-        file_dir = './IMG/'
+        file_dir = './data/IMG/'
         left_image = batch_sample[1].split('/')[-1]
         right_image = batch_sample[2].split('/')[-1]
         center_image = batch_sample[0].split('/')[-1]
         measurement = float(batch_sample[3])
         if training and np.random.rand() < 0.6:
-          image, measurement = recovery_argument(file_dir, center_image, left_image, right_image, measurement)
+          image, measurement = argument_image_data(file_dir, center_image, left_image, right_image, measurement)
         else:
 
           image = load_image(file_dir, center_image)
 
- #       image, measurement = flip_image(image, measurement)
+        #image, measurement = flip_image(image, measurement)
 
         images[index] = image
         angles[index] = measurement
@@ -82,7 +88,6 @@ from keras.layers.pooling import MaxPooling2D
 train_generator = generator(train_samples, True, batch_size=32)
 validation_generator = generator(validation_samples, False, batch_size=32)
 
-#ch, row, col = 3, 80, 320  # Trimmed image format
 
 def LeNet():
   model = Sequential()
@@ -100,8 +105,8 @@ def LeNet():
 
 def E2ENet():
   model = Sequential()
-  model.add(Lambda(lambda x: ((x/255.0) - 0.5), input_shape=(col, row, ch)))
-  model.add(Cropping2D(cropping=((50, 20), (0,0))))
+  model.add(Lambda(lambda x: ((x/255.0) - 0.5), input_shape=(row, col, ch)))
+  model.add(Cropping2D(cropping=((70, 20), (0,0))))
   model.add(Conv2D(24, (5, 5), strides=(2, 2), activation='relu'))
   model.add(Conv2D(36, (5, 5), strides=(2,2), activation='relu'))
   model.add(Conv2D(48, (5, 5), strides=(2,2), activation='relu'))
@@ -117,8 +122,8 @@ def E2ENet():
   model.compile(loss='mse', optimizer='adam')
   model.fit_generator(train_generator, samples_per_epoch=
             len(train_samples), validation_data=validation_generator,
-            nb_val_samples=len(validation_samples), nb_epoch=3)
-  model.save('model2.h5')
+            nb_val_samples=len(validation_samples), nb_epoch=10)
+  model.save('model.h5')
 E2ENet()
 """
 def process_file(lines):
