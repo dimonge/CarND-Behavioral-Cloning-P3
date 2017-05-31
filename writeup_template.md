@@ -45,11 +45,11 @@ After cropping.
 ![After cropping](./images/cropped_center_2017_05_29_13_26_39_114.jpg)
 
 
-The model was trained with randomly augmented dataset and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
+The model was trained with randomly augmented dataset and validated on different data sets to ensure that the model was not overfitting (code line 113-129). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
 #### Model parameter tuning
 
-The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 25).
+The model used an adam optimizer with a linear rate of 0.0001 (model.py line 175).
 
 #### Appropriate training data
 
@@ -63,34 +63,33 @@ For details about how I created the training data, see the next section.
 
 The overall strategy for deriving a model architecture was to use the NVIDIA architecture provided in the documents. 
 
-In order to gauge how well the model was working, I split my image and steering angle data into a 80% training and 20% validation set.
+In order to gauge how well the model was working, I split my image and steering angle data into a 70% training and 30% validation set.
 
 My first step was to implement the NVIDIA model without argumenting. I found that the model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
 
 I ran the result on the simulator, The car was driving off road and wasn't able to recover from it.
 
-So in the second step, I applied some argumentation on the dataset to generalize the model. So I applied flipping the image and recovery on both sides when the car is in a bend, cropping the image. 
+So in the second step, I applied some argumentation on the dataset to generalize the model. So I applied flipping the image and recovery argumentation on both sides when the car is in a bend, applied cropping the image to remove the noise from the dataset. 
 
-I ran the result on the simulator, The car was able to drive autonomously for a while but it went off road after the bridged where their was no pavement line on the side of the road.
-
+I ran the result on the simulator, The car was able to drive autonomously for a while but It went off road after the bridged where their was no pavement line on the right side of the road.
 
 In the third step, I further argumented the dataset by applying random shadow, brightness of the images and translating the image. The model was still overfitting and the car was getting better at driving but still drift off the road at times.
 
-I played around with various learning rate, number of epoch and applied dropouts, I finally got a low mean squared error on both training and validation set with the following parameters
+I played around with various learning rates, number of epochs and applied dropouts, I finally got a low mean squared error on both training and validation set with the following parameters
 
 * Learning rate: 0.0001
 * Number of epoach: 3
-* 1 Dropout
+* 1 Dropout with 0.5 Keep rate
 * 5 Convolutional Layer
 * 3 Fully Connected Layer
 * 1 Normalization layer
-
  
-The final step when I ran the simulator to see how well the car was driving around track one. At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+In the final step when I ran the simulator to see how well the car was driving around track one. At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 #### Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes 
+The final model architecture (model.py lines 157-173) consisted of a convolution neural network with the following layers.
+
 ```python
 def E2ENet():
   model = Sequential()
@@ -112,17 +111,14 @@ def E2ENet():
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving
 
-
 ![center image](./images/center_2017_05_29_13_26_47_138.jpg)
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to recover better when in curves. These images show what a recovery looks like starting from left to the right sides of the road.
 
 ![left image](./images/center_2017_05_29_13_26_47_956.jpg)
 ![center image](./images/center_2017_05_29_13_26_50_522.jpg)
 ![right image](./images/center_2017_05_29_13_26_42_577.jpg)
 
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles to generalize the image fed into the model. 
+To augment the dataset, I also flipped images and angles to generalize the image fed it into the model. 
 
 I finally randomly shuffled the data set where 70% training set and 30% of validation set. 
