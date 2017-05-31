@@ -32,12 +32,17 @@ The model.py file contains the code for training, argumenting and saving the con
 
 ### Model Architecture and Training Strategy
 
-I used the NVIDIA models in this project [paper](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). The network consists of 9 layers which includes 5 Convolutional Layers, 3 Fully Connected Layer and a Normalization layer. My model uses a 3x3 filter sizes (model.py lines 18-24). The image of the model is as follows.
+I used the NVIDIA models in this project [paper](http://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). The network consists of 9 layers which includes 5 Convolutional Layers, 3 Fully Connected Layer and a Normalization layer. The image of the architecture can be found on page 5 (figure 4) 
 
 The images was argumented by cropping out parts like sky, trees and the front of the car to prevent distraction in the model. Example of the images is as follows
 
 Before cropping. 
+
+![Before cropping](./images/center_2017_05_29_13_26_39_114.jpg)
+
 After cropping.
+
+![After cropping](./images/)
 
 
 The model was trained with randomly augmented dataset and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
