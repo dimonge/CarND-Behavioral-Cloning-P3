@@ -127,20 +127,10 @@ I then recorded the vehicle recovering from the left side and right sides of the
 
 ![left image](./images/center_2017_05_29_13_26_47_956.jpg)
 ![center image](./images/center_2017_05_29_13_26_50_522.jpg)
-![right image][image5]
+![right image](./images/center_2017_05_29_13_26_42_577.jpg)
 
 Then I repeated this process on track two in order to get more data points.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+To augment the data sat, I also flipped images and angles to generalize the image fed into the model. 
 
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
-
-
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I finally randomly shuffled the data set where 70% training set and 30% of validation set. 
