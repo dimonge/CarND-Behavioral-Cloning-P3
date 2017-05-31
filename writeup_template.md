@@ -73,7 +73,7 @@ The overall strategy for deriving a model architecture was to use the NVIDIA arc
 
 In order to gauge how well the model was working, I split my image and steering angle data into a 80% training and 20% validation set.
 
-My first step was to implement the NVIDIA model without argumenting. I found that the model had a low mean squared error on the training set but a hight mean squared error on the validation set. This implied that the model was overfitting. 
+My first step was to implement the NVIDIA model without argumenting. I found that the model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
 
 I ran the result on the simulator, The car was driving off road and wasn't able to recover from it.
 
@@ -82,21 +82,39 @@ So in the second step, I applied some argumentation on the dataset to generalize
 I ran the result on the simulator, The car was able to drive autonomously for a while but it went off road after the bridged where their was no pavement line on the side of the road.
 
 
-In the third step, I further argumented the dataset by applying random shadow, brightness of the images and translating the image.
+In the third step, I further argumented the dataset by applying random shadow, brightness of the images and translating the image. The model was still overfitting and the car was getting better at driving but still drift off the road at times.
 
-I ran the result on the simulator, The car was driving off road and wasn't able to recover from it.
+I played around with various learning rate, number of epoch and applied dropouts, I finally got a low mean squared error on both training and validation set with the following parameters
+
+* Learning rate: 0.0001
+* Number of epoach: 3
+* 1 Dropout
+* 5 Convolutional Layer
+* 3 Fully Connected Layer
+* 1 Normalization layer
+
  
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
-
-At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
+The final step when I ran the simulator to see how well the car was driving around track one. At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 #### Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
-
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
-
-![alt text][image1]
+The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes 
+```python
+def E2ENet():
+  model = Sequential()
+  model.add(Lambda(lambda x: ((x/255.0) - 0.5), input_shape=(row, col, ch)))
+  model.add(Cropping2D(cropping=((70, 20), (0,0))))
+  model.add(Conv2D(24, (5, 5), strides=(2, 2), activation='relu'))
+  model.add(Conv2D(36, (5, 5), strides=(2,2), activation='relu'))
+  model.add(Conv2D(48, (5, 5), strides=(2,2), activation='relu'))
+  model.add(Conv2D(64, (3, 3), activation='relu'))
+  model.add(Conv2D(64, (3, 3), activation='relu'))
+  model.add(Flatten())
+  model.add(Dense(100))
+  model.add(Dense(50))
+  model.add(Dense(10))
+  model.add(Dense(1))
+```
 
 #### Creation of the Training Set & Training Process
 
