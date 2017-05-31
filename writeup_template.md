@@ -42,7 +42,7 @@ Before cropping.
 
 After cropping.
 
-![After cropping](./images/)
+![After cropping](./images/cropped_center_2017_05_29_13_26_39_114.jpg)
 
 
 The model was trained with randomly augmented dataset and validated on different data sets to ensure that the model was not overfitting (code line 10-16). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
