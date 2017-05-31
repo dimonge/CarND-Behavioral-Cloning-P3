@@ -1,3 +1,4 @@
+
 import csv
 import cv2
 import numpy as np
@@ -21,7 +22,10 @@ for line in lines:
 
   # adjust the measurement for the left and right cameras
   steering_center = measurement
-  
+
+X_train = np.array(images)
+y_train = np.array(measurements)
+"""  
   correction = 0.2
   steering_left = steering_center + correction
   steering_right = steering_center - correction
@@ -34,7 +38,6 @@ for line in lines:
   # add image and angles to the data set
   images.extend(img_center, img_left, img_right)
   measurements.extend(steering_center, steering_left, steering_right)
-
 
 X_train = np.array(images)
 y_train = np.array(measurements)
@@ -76,4 +79,23 @@ plt.ylabel("mean squared error loss")
 plt.xlabel("epoch")
 plt.legend(["training set", "validation set"], loc="upper right")
 plt.show()
+"""
 
+from keras.models import Sequential, Model
+from keras.layers import Flatten, Lambda, Cropping2D, Dense
+from keras.layers.convolutional import Convolution2D
+from keras.layers.pooling import MaxPooling2D
+
+model = Sequential()
+model.add(Lambda(lambda x: (x / 255) - 0.5, input_shape=(160, 320, 3)))
+model.add(Convolution2D(6,5,5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Convolution2D(6,5,5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Flatten())
+model.add(Dense(120))
+model.add(Dense(84))
+model.add(Dense(1))
+
+model.compile(loss='mse', optimizer='adam')
+model.fit(X_train, y_train, validation_split=0.2, shuffle=True, nb_epoch=3)
