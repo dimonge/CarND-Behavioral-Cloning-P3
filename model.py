@@ -51,14 +51,14 @@ def random_brightness(image):
   """
   # HSV (Hue, Saturation, Value) is also called HSB ('B' for Brightness).
   hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-  ratio = 1.0 + 0.4 * (np.random.rand() - 0.5)
+  ratio = 1.0 + 0.4 * (np.random.rand() - 0.6)
   hsv[:,:,2] =  hsv[:,:,2] * ratio
   return cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
 
 def flip_image(image, measurement):
-  if np.random.rand() < 0.5:
-    image = cv2.flip(image, 1)
-    measurement = -measurement
+  #if np.random.rand() < 0.5:
+  image = cv2.flip(image, 1)
+  measurement = -measurement
   return image, measurement
 
 def image_translate(image, steering_angle):
@@ -116,10 +116,10 @@ def generator(samples, training, batch_size=32):
         right_image = batch_sample[2].split('/')[-1]
         center_image = batch_sample[0].split('/')[-1]
         measurement = float(batch_sample[3])
-        if training and np.random.rand() < 0.5:
-          image, measurement = argument_image_data(file_dir, center_image, left_image, right_image, measurement)
-        else:
-          image = load_image(file_dir, center_image)
+       # if training and np.random.rand() < 0.6:
+        image, measurement = argument_image_data(file_dir, center_image, left_image, right_image, measurement)
+        #else:
+          #image = load_image(file_dir, center_image)
         images[index] = image
         angles[index] = measurement
         index+=1
@@ -142,7 +142,7 @@ validation_generator = generator(validation_samples, False, batch_size=32)
 def LeNet():
   model = Sequential()
   # Preprocess incoming data, centered around zero with small standard deviation 
-  model.add(Lambda(lambda x: x/127.5 - 0.5, input_shape=(None, 320, 80, 3)))
+  model.add(Lambda(lambda x: x/255 - 0.5, input_shape=(None, 320, 80, 3)))
 
   model.add(Convolution2D(6,5,5, activation='relu'))
   model.add(MaxPooling2D())
@@ -155,7 +155,7 @@ def LeNet():
 
 def E2ENet():
   model = Sequential() 
-  model.add(Lambda(lambda x: ((x/255.0) - 0.5), input_shape=(row, col, ch)))
+  model.add(Lambda(lambda x: ((x/127.5) - 1.0), input_shape=(row, col, ch)))
   
 # Crop the image at top 65px and bottom 20px
   model.add(Cropping2D(cropping=((65, 20), (0,0))))
@@ -172,10 +172,10 @@ def E2ENet():
   model.add(Dense(10))
   model.add(Dense(1))
 
-  model.compile(loss='mse', optimizer=Adam(lr=0.0001))
+  model.compile(loss='mse', optimizer=Adam(lr=0.00001))
   model.fit_generator(train_generator, samples_per_epoch=
             len(train_samples), validation_data=validation_generator,
-            nb_val_samples=len(validation_samples), nb_epoch=3)
+            nb_val_samples=len(validation_samples), nb_epoch=10)
   model.save('model.h5')
 
 print("Running the model...")
